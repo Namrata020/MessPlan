@@ -3,11 +3,14 @@ package tester;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.io.*;
 
 import code.Customer;
 import static utils.ValidationRules.*;
-import static utils.CustUtils.populateCustomerList;
+import static utils.CustUtils.*;
+import static utils.IOUtils_mess.*;
 import code.Plan;
 import custom_exceptions.*;
 import custom_sorting.*;
@@ -15,33 +18,34 @@ import utils.CustUtils;
 import utils.ValidationRules;
 
 public class TestMessPlan {	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, IOException {
 		try(Scanner sc=new Scanner(System.in)){
-		List<Customer> custList=populateCustomerList() ;
+		List<Customer> custList=populateCustomerList();
 		boolean exit=false;
 		while(!exit) {
 			System.out.println();
 			System.out.println("Options: ");
 			System.out.println("1.Display All\n"+"2.Sign Up\n"+"3.Sign in\n"+"4.Change Password\n"+
 			"5.Sort as per first name\n"+"6.Sort based on Plan\n"+"7.Sort based on registration date\n"+
-					"8.Unsubscribe customer\n"+"9.Get plan end date\n"+"0.Exit\n");
+			"8.Unsubscribe customer\n"+"9. Store Customer details\n"+"10. Read customer details from file\n"+"0.Exit\n");
 			try {
 				switch(sc.nextInt()) {
 				case 1:
 					for(Customer c:custList) {
 						c.setPlanEndDate(assignEndDate(c.getRegisterDate(),c.getPln(),c));
 						c.setFinal_amount(c.getPln().getMonthCost());
+						validatePlanAmount(c.getPln(),c.getFinal_amount());
 						System.out.println(c);
 					}
 					break;
 					
 				case 2:
 					System.out.println("Available mess plans---");
-					System.out.println("MONTHLY----3000\n"+"QUARTERLY----11700\n"+"HALFYEAR----17500\n"+"YEARLY----32000");
+					System.out.println("MONTHLY\n"+"QUARTERLY\n"+"HALFYEAR\n"+"YEARLY");
 					System.out.println("Enter customer details: fname, lname, email, pwd, registerDate, phoneNo, pln, address");
 					
-					/*String fname, String lname, String email, String pwd,String rDate,String phoneNo,
-					 * String plan, String address, double fAmount,List<Customer> custList*/
+					/*String fname, String lname, String email, String pwd, String rDate, String phoneNo,
+					 * String plan, String address, List<Customer> custList*/
 					
 					Customer newC = validateAllInputs(sc.next(),sc.next(),sc.next(),sc.next(),sc.next(),
 							sc.next(),sc.next(),sc.next(),custList);	
@@ -64,8 +68,8 @@ public class TestMessPlan {
 					newC = authenticateCustomer(sc.next(),sc.next(),custList);
 					System.out.println("Successfully Signed inn!!");
 					System.out.print("Enter new password: ");
-					String newPass = sc.next();
-					newC.setPwd(newPass);
+					//String newPass = sc.next();
+					newC.setPwd(sc.next());
 					System.out.println("Password changed successfully!!");
 					break;
 					
@@ -100,6 +104,24 @@ public class TestMessPlan {
 						System.out.println("----Successfully Unsubscribed from Plan----");
 					break;
 					
+				case 9:
+					System.out.println("Enter file name");
+					sc.nextLine();
+					String fileName = sc.nextLine();
+					storeCustomerDetails(custList,fileName);
+					System.out.println("Customer details stored successfully!!");
+					break;
+					
+				case 10:
+					System.out.println("Enter file name");
+					sc.nextLine();
+					BufferedReader br = new BufferedReader(new FileReader(sc.nextLine()));
+					System.out.println("File data---");
+					br.lines()
+					.forEach(p -> System.out.println(p));
+					System.out.println("---Data read over---");
+					break;
+				
 				case 0:
 					exit = true;
 					System.out.println("Exiting the program");
