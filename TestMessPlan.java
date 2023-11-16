@@ -18,7 +18,7 @@ import utils.CustUtils;
 import utils.ValidationRules;
 
 public class TestMessPlan {	
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public static void main(String[] args){
 		try(Scanner sc=new Scanner(System.in)){
 		List<Customer> custList=populateCustomerList();
 		boolean exit=false;
